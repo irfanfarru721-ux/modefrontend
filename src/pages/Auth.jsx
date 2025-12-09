@@ -1,44 +1,87 @@
 import React, { useState } from "react";
-import axiosInstance from "../api/axios";
+import axios from "../api/axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Auth() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [isLogin, setIsLogin] = useState(true);
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const login = async () => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
     try {
-      const res = await axiosInstance.post("/auth/login", {
-        email,
-        password,
-      });
+      if (isLogin) {
+        const res = await axios.post("/auth/login", {
+          email: form.email,
+          password: form.password,
+        });
 
-      console.log("Login OK:", res.data);
-      alert("Login successful!");
-    } catch (error) {
-      console.error(error);
-      alert("Login failed");
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        navigate("/");
+      } else {
+        await axios.post("/auth/register", form);
+        setIsLogin(true);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div style={{ maxWidth: 400, margin: "auto", marginTop: 40 }}>
+      <h2>{isLogin ? "Login" : "Register"}</h2>
+      {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <input
-        type="text"
-        placeholder="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+      <form onSubmit={handleSubmit}>
+        {!isLogin && (
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+          />
+        )}
 
-      <input
-        type="password"
-        placeholder="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
 
-      <button onClick={login}>Login</button>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+
+        <button type="submit" style={{ marginTop: 10 }}>
+          {isLogin ? "Login" : "Register"}
+        </button>
+      </form>
+
+      <button
+        onClick={() => setIsLogin(!isLogin)}
+        style={{ marginTop: 15, background: "none", border: "none", color: "blue" }}
+      >
+        {isLogin ? "Switch to Register" : "Switch to Login"}
+      </button>
     </div>
   );
 }
+

@@ -1,0 +1,4 @@
+body { font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:#f7f7f8; color:#111; margin:0; }
+a { color: inherit; text-decoration:none; }
+input { padding:8px; border:1px solid #ddd; border-radius:6px; }
+button { padding:8px 12px; border-radius:6px; border:1px solid #ccc; background:#fff; cursor:pointer; }

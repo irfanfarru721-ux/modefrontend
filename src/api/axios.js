@@ -5,7 +5,7 @@ const API = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-API.interceptors.request.use(req => {
+API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) req.headers.Authorization = `Bearer ${token}`;
   return req;
